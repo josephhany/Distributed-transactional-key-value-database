@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "pebble-grpc/api";
+
+// Service definition
+service KVService {
+    rpc PreWrite(PreWriteRequest) returns (PreWriteResponse);
+    rpc Commit(CommitRequest) returns (CommitResponse);
+    rpc Read(ReadRequest) returns (ReadResponse);
+}
+
+// Request message for prewrite operation
+message PreWriteRequest {
+    bytes key = 1;               // Key to write
+    bytes value = 2;             // Value to write
+    int64 start_ts = 3;          // Start timestamp of the transaction
+    bytes primary_key = 4;       // Primary key of the transaction
+}
+
+// Response message for prewrite operation
+message PreWriteResponse {
+    bool success = 1;            // Indicates if the operation was successful
+    string error = 2;            // Error message in case of failure
+}
+
+// Request message for commit operation
+message CommitRequest {
+    bytes key = 1;               // Key to commit
+    int64 commit_ts = 2;         // Commit timestamp of the transaction
+    int64 start_ts = 3;          // Start timestamp of the transaction
+    bytes primary_key = 4;       // Primary key of the transaction
+    bool is_primary = 5;         // Indicates if the key is primary
+}
+
+// Response message for commit operation
+message CommitResponse {
+    bool success = 1;            // Indicates if the operation was successful
+    string error = 2;            // Error message in case of failure
+}
+
+// Request message for read operation
+message ReadRequest {
+    bytes key = 1;               // Key to read
+    int64 start_ts = 2;          // Start timestamp of the transaction
+}
+
+// Response message for read operation
+message ReadResponse {
+    bytes value = 1;             // Value read
+    bool success = 2;            // Indicates if the operation was successful
+    string error = 3;            // Error message in case of failure
+}
+
+// New service definition for TSO
+service TSO {
+    rpc GetTS(TSRequest) returns (TSResponse);
+}
+
+// Request message for getting a timestamp
+message TSRequest {}
+
+// Response message for getting a timestamp
+message TSResponse {
+    int64 timestamp = 1;
+}
